@@ -5,6 +5,11 @@ const app = express();
 const PORT = 3000;
 app.use(express.json());
 
+const swaggerUi = require("swagger-ui-express");
+const openapiSpec = require("./openapi.json");
+// Swagger UI reads openapi.json and turns it into an interactive page.
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiSpec));
+
 app.get("/", (req, res) => {
   res.json({
     name: "Task API",
