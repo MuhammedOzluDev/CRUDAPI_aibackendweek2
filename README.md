@@ -40,8 +40,8 @@ Content-Type: application/json; charset=utf-8
 
 ## Swagger UI screenshot
 
-_(paste your screenshot of http://localhost:3000/docs here)_
+![alt text](image.png)
 
 ## The mortality experiment
 
-_(after restarting the server and hitting GET /tasks again, write 1-2 sentences here about what happened and why — this is the whole point of Week 3)_
+After restarting the server, all tasks I had created during the previous run were gone, only the 3 original seed tasks remained. This happens because the task list lives only in the server's memory (RAM); when the Node.js process stops, that memory is wiped, and starting the process again re-runs the code from scratch, recreating only the hardcoded seed data. This is exactly why a real application needs a database to persist data beyond the process's lifetime.
