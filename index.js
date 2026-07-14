@@ -1,6 +1,9 @@
 const express = require("express");
+// This middleware reads incoming JSON bodies and puts them on req.body
+// Without it, req.body would be undefined for every POST/PUT
 const app = express();
 const PORT = 3000;
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
@@ -38,6 +41,22 @@ app.get("/tasks/:id", (req, res) => {
   }
 
   res.json(task);
+});
+
+// POST /tasks, create a new task
+app.post("/tasks", (req, res) => {
+  const { title } = req.body;
+
+  // Validation: the server never trusts the client.
+  if (!title || title.trim() === "") {
+    return res.status(400).json({ error: "Title is required" });
+  }
+
+  const newTask = { id: nextId, title, done: false };
+  nextId++;
+  tasks.push(newTask);
+
+  res.status(201).json(newTask);
 });
 
 app.listen(PORT, () => {
