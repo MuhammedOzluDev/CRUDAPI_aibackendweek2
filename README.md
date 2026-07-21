@@ -40,7 +40,7 @@ Content-Type: application/json; charset=utf-8
 
 ## Swagger UI screenshot
 
-![alt text](image.png)
+![alt text](image-1.png)
 
 ## The mortality experiment
 

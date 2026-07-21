@@ -1,10 +1,30 @@
 const express = require("express");
-// This middleware reads incoming JSON bodies and puts them on req.body
-// Without it, req.body would be undefined for every POST/PUT
+const { DatabaseSync } = require("node:sqlite");
+
 const app = express();
 const PORT = 3000;
 app.use(express.json());
 
+// Veritabanı dosyasını aç (yoksa otomatik oluşturur)
+const db = new DatabaseSync("tasks.db");
+
+// tasks tablosunu yoksa oluştur
+db.exec(`
+  CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    done INTEGER NOT NULL DEFAULT 0
+  )
+`);
+
+// Tablo boşsa 3 örnek görev ekle
+const countRow = db.prepare("SELECT COUNT(*) AS count FROM tasks").get();
+if (countRow.count === 0) {
+  const insertSeed = db.prepare("INSERT INTO tasks (title, done) VALUES (?, ?)");
+  insertSeed.run("Buy milk", 0);
+  insertSeed.run("Finish assignment", 0);
+  insertSeed.run("Read a book", 1);
+}
 const swaggerUi = require("swagger-ui-express");
 const openapiSpec = require("./openapi.json");
 // Swagger UI reads openapi.json and turns it into an interactive page.
