@@ -45,12 +45,42 @@ app.get("/health", (req, res) => {
 // GET /tasks, return the whole list
 // GET /tasks, return the whole list
 app.get("/tasks", (req, res) => {
-  const allTasks = db.prepare("SELECT * FROM tasks").all();
+  const { search, done } = req.query;
+  let query = "SELECT * FROM tasks WHERE 1=1";
+  const params = [];
+
+  if (search) {
+    query += " AND title LIKE ?";
+    params.push(`%${search}%`);
+  }
+
+  if (done !== undefined) {
+    query += " AND done = ?";
+    params.push(done === "true" ? 1 : 0);
+  }
+
+  if (req.query.sort === "title") {
+  query += " ORDER BY title";
+   }
+
+  const allTasks = db.prepare(query).all(...params);
   res.json(allTasks);
 });
 
+app.get("/stats", (req, res) => {
+  const total = db.prepare("SELECT COUNT(*) AS count FROM tasks").get().count;
+  const completed = db.prepare("SELECT COUNT(*) AS count FROM tasks WHERE done = 1").get().count;
+  res.json({ total, completed, remaining: total - completed });
+});
 // GET /tasks/:id, return a single task, or 404 if it doesn't exist
 // GET /tasks/:id, return a single task, or 404 if it doesn't exist
+
+app.get("/stats", (req, res) => {
+  const total = db.prepare("SELECT COUNT(*) AS count FROM tasks").get().count;
+  const completed = db.prepare("SELECT COUNT(*) AS count FROM tasks WHERE done = 1").get().count;
+  res.json({ total, completed, remaining: total - completed });
+});
+
 app.get("/tasks/:id", (req, res) => {
   const id = Number(req.params.id);
   const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
