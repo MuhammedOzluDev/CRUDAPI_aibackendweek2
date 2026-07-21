@@ -72,6 +72,7 @@ app.get("/tasks/:id", (req, res) => {
 });
 
 // POST /tasks, create a new task
+// POST /tasks, create a new task
 app.post("/tasks", (req, res) => {
   const { title } = req.body;
 
@@ -80,9 +81,8 @@ app.post("/tasks", (req, res) => {
     return res.status(400).json({ error: "Title is required" });
   }
 
-  const newTask = { id: nextId, title, done: false };
-  nextId++;
-  tasks.push(newTask);
+  const result = db.prepare("INSERT INTO tasks (title, done) VALUES (?, ?)").run(title, 0);
+  const newTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(result.lastInsertRowid);
 
   res.status(201).json(newTask);
 });
